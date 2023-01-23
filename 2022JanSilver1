@@ -1,0 +1,111 @@
+//USACO 2022 January Silver Problem 1
+
+import java.io.*;
+import java.util.StringTokenizer;
+
+public class Main {
+
+    public static void main(String[] args) throws IOException {
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(reader.readLine());
+        int n = Integer.parseInt(st.nextToken());
+        for(int i=0; i<n; i++){
+            StringTokenizer st1 = new StringTokenizer(reader.readLine());
+            long n1 = Long.parseLong(st1.nextToken());
+            long n2 = Long.parseLong(st1.nextToken());
+            long ops = 0;
+            if (n1 >= n2) {
+                while (n1 > n2) {
+                    if (n1 % 2 == 0) {
+                        n1 /= 2;
+                        ops++;
+                    } else {
+                        n1 ++;
+                        n1 /= 2;
+                        ops += 2;
+                    }
+                }
+                long lops = n2 - n1;
+                long fops = lops;
+                int f2 = 1;
+                do {
+                    lops = fops;
+                    long newn2 = n2;
+                    long newn1 = n1;
+                    fops = 0;
+                    for (int a = 0; a < f2; a++) {
+                        if (newn2 % 2 == 0) {
+                            newn2 /= 2;
+                            fops++;
+                        } else {
+                            newn2--;
+                            newn2 /= 2;
+                            fops += 2;
+                        }
+                    }
+                    for (int a = 0; a < f2; a++) {
+                        if (newn1 % 2 == 0) {
+                            newn1 /= 2;
+                            fops++;
+                        } else {
+                            newn1++;
+                            newn1 /= 2;
+                            fops += 2;
+                        }
+                    }
+                    fops += newn2 - newn1;
+                    f2++;
+                } while (fops < lops);
+                ops += lops;
+            } else {
+                long lops = 0;
+                long newn1 = n1;
+                long newn2 = n2;
+                while (newn2 / 2 >= newn1) {
+                    if (newn2 % 2 == 0) {
+                        newn2 /= 2;
+                        lops++;
+                    } else {
+                        newn2--;
+                        newn2 /= 2;
+                        lops += 2;
+                    }
+                }
+                lops += newn2 - newn1;
+                long fops = lops;
+                int f2 = 1;
+                do {
+                    newn1 = n1;
+                    lops = fops;
+                    fops = 0;
+                    for (int a = 0; a<f2; a++){
+                        if(newn1 % 2 ==0){
+                            newn1 /= 2;
+                            fops++;
+                        } else {
+                            newn1++;
+                            newn1/=2;
+                            fops+=2;
+                        }
+                    }
+                    newn2 = n2;
+                    while (newn2 / 2 >= newn1) {
+                        if (newn2 % 2 == 0) {
+                            newn2 /= 2;
+                            fops++;
+                        } else {
+                            newn2--;
+                            newn2 /= 2;
+                            fops += 2;
+                        }
+                    }
+                    fops += newn2 - newn1;
+                    f2++;
+                } while (fops < lops);
+                ops = lops;
+            }
+            System.out.println(ops);
+        }
+    }
+}
