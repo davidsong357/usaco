@@ -1,0 +1,153 @@
+//USACO 2022 January Silver Problem 3
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Stack;
+import java.util.StringTokenizer;
+
+public class Main {
+
+    static Stack<Cereal> nodeStack=new Stack<>();
+    static int block = 1;
+    public static void main(String[] args) throws IOException{
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(System.out));
+        StringTokenizer st = new StringTokenizer(reader.readLine());
+        int n = Integer.parseInt(st.nextToken());
+        int m = Integer.parseInt(st.nextToken());
+        ArrayList<Cereal> cs = new ArrayList<>();
+
+        for(int i=0; i<m; i++){
+            Cereal c = new Cereal (i + 1);
+            cs.add(c);
+        }
+
+        ArrayList<Cow> cows = new ArrayList<>();
+        int[] blocks = new int[n];
+
+        for(int i=0; i<n; i++){
+            st = new StringTokenizer(reader.readLine());
+            int c1 = Integer.parseInt(st.nextToken());
+            int c2 = Integer.parseInt(st.nextToken());
+            Cow c = new Cow (c1, c2, i + 1);
+            cows.add(c);
+            cs.get(c1 - 1).neighbors.add(cs.get(c2 - 1));
+            cs.get(c2 - 1).neighbors.add(cs.get(c1 - 1));
+        }
+
+        dfs(cs);
+
+        for(int i=0; i<n; i++){
+            blocks[i] = cs.get(cows.get(i).c1 - 1).block;
+        }
+
+        ArrayList<Cow> allC = new ArrayList<>();
+        int min = 0;
+
+        for(int i=0; i<block; i++){
+            ArrayList<Cow> blockcows = new ArrayList<>();
+            HashSet<Integer> cereals = new HashSet<>();
+            for(int a=0; a<n; a++){
+                if(blocks[a] == i + 1){
+                    blockcows.add(cows.get(a));
+                    cereals.add(cows.get(a).c1);
+                    cereals.add(cows.get(a).c2);
+                }
+            }
+
+            int eaten = 0;
+            if(cereals.size() < blockcows.size()){
+                min += blockcows.size() - cereals.size();
+            }
+            while (eaten != Math.min(blockcows.size(), cereals.size())) {
+                eaten = 0;
+                boolean[] taken = new boolean[m];
+                int[] pos = new int[m];
+                ArrayList<Cow> no = new ArrayList<>(blockcows);
+
+                for (int a = 0; a < no.size(); a++) {
+                    if (!taken[no.get(a).c1 - 1]) {
+                        taken[no.get(a).c1 - 1] = true;
+                        pos[no.get(a).c1 - 1] = a;
+                        eaten++;
+                    } else if (!taken[no.get(a).c2 - 1]) {
+                        taken[no.get(a).c2 - 1] = true;
+                        pos[no.get(a).c2 - 1] = a;
+                        eaten++;
+                    } else {
+                        Cow cow = no.get(a);
+                        no.add(Math.min(pos[no.get(a).c1 - 1], pos[no.get(a).c2 - 1]), cow);
+                        no.remove(a + 1);
+                    }
+                }
+
+                if(eaten != Math.min(blockcows.size(), cereals.size())){
+                    blockcows=no;
+                }
+            }
+            allC.addAll(blockcows);
+        }
+
+        out.write(String.valueOf(min));
+        out.newLine();
+        for(int i=0; i<n; i++) {
+            out.write(String.valueOf(allC.get(i).pos));
+            out.newLine();
+        }
+        out.close();
+    }
+    public static void dfs (ArrayList<Cereal> nodesList){
+        for(Cereal n: nodesList){
+            if(!n.visited){
+                dfsWithStack(n);
+                block++;
+            }
+        }
+    }
+    public static void dfsWithStack (Cereal rootNode){
+        nodeStack.push(rootNode);
+        rootNode.visited = true;
+        rootNode.block = block;
+
+        while(!nodeStack.isEmpty()){
+
+            Cereal actualNode=nodeStack.pop();
+            actualNode.block = block;
+
+            for(Cereal neighbors: actualNode.neighbors){
+                if(!neighbors.visited){
+                    neighbors.block = block;
+                    neighbors.visited = true;
+                    nodeStack.push(neighbors);
+
+                }
+            }
+
+        }
+    }
+}
+
+class Cereal {
+    int val;
+    int block;
+    ArrayList<Cereal> neighbors;
+    boolean visited;
+    public Cereal(int val){
+        this.val = val;
+        block = 0;
+        neighbors = new ArrayList<>();
+    }
+}
+
+class Cow {
+    int c1;
+    int c2;
+    int pos;
+    public Cow (int c1, int c2, int pos){
+        this.c1 = c1;
+        this.c2 = c2;
+        this.pos = pos;
+    }
+}
