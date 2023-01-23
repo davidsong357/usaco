@@ -1,0 +1,39 @@
+//USACO 2020 December Bronze Problem 1
+
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args){
+        Scanner myReader=new Scanner(System.in);
+        ArrayList<Integer> numbers=new ArrayList<Integer>();
+        for(int i=0; i<7; i++){
+            numbers.add(myReader.nextInt());
+        }
+        sortNumbers(numbers);
+        for(int i=0; i<2; i++){
+            System.out.print(numbers.get(i)+" ");
+        }
+        if(numbers.get(2)==numbers.get(0)+numbers.get(1)){
+            System.out.print(numbers.get(3));
+        } else {
+            System.out.print(numbers.get(2));
+        }
+    }
+    public static void sortNumbers (ArrayList<Integer> nums){
+        boolean done=false;
+        for(int i=0; i<nums.size()-1; i++){
+            for (int x=0; x<nums.size()-1-i; x++){
+                if(nums.get(x)>nums.get(x+1)){
+                    int temp=nums.get(x);
+                    nums.set(x, nums.get(x+1));
+                    nums.set(x+1, temp);
+                    done=true;
+                }
+            }
+            if(!done){
+                return;
+            }
+        }
+    }
+}
