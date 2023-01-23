@@ -1,0 +1,108 @@
+//USACO 2021 January Silver Problem 1
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Stack;
+
+public class Main {
+    static int[] posSizes;
+    public static void main(String[] args) throws IOException {
+
+        BufferedReader reader = new BufferedReader (new InputStreamReader(System.in));
+        BufferedWriter out = new BufferedWriter( new OutputStreamWriter(System.out));
+        String line = reader.readLine();
+        String[] strs = line.trim().split("\\s+");
+        int n=Integer.parseInt(strs[0]);
+        int k=Integer.parseInt(strs[1]);
+        int[] ret = new int[n];
+        ArrayList<Cow> allC = new ArrayList<>();
+        posSizes=new int[n];
+        for(int i=0; i<ret.length; i++){
+            ret[i]=i+1;
+            allC.add(new Cow(i+1));
+        }
+
+        for(int i=0; i<k; i++){
+            String line1 = reader.readLine();
+            String[] strs1 = line1.trim().split("\\s+");
+            int a = Integer.parseInt(strs1[0]);
+            int b = Integer.parseInt(strs1[1]);
+            Cow c = allC.get(ret[a-1] - 1);
+            Cow c1= allC.get(ret[b-1] - 1);
+            c.addPos(b);
+            c1.addPos(a);
+            int temp = ret[a - 1];
+            ret[a-1] = ret[b-1];
+            ret[b-1] = temp;
+        }
+        for(int i=0; i<ret.length; i++){
+            Cow c = allC.get(i);
+            Cow c1 = allC.get(ret[i] - 1);
+            c.addNeighbors(c1);
+            c1.addNeighbors(c);
+        }
+        dfs(allC);
+        for(int i=0; i<posSizes.length; i++){
+            out.write(String.valueOf(posSizes[i]));
+            out.newLine();
+        }
+        out.close();
+    }
+    public static void dfs (ArrayList<Cow> nodesList){
+        for(Cow n: nodesList){
+            if(!n.visited){
+                n.setVisited();
+                dfsWithStack(n);
+            }
+        }
+    }
+    public static void dfsWithStack (Cow rootNode){
+        Stack<Cow> nodeStack=new Stack<>();
+        nodeStack.push(rootNode);
+        HashSet<Integer> pos = new HashSet<>(rootNode.pos);
+        ArrayList<Integer> cnums = new ArrayList<>();
+        cnums.add(rootNode.cnum);
+        rootNode.setVisited();
+        while(!nodeStack.isEmpty()){
+
+            Cow actualNode=nodeStack.pop();
+            for(Cow neighbors: actualNode.cneighbors){
+                if(!neighbors.visited){
+                    pos.addAll(neighbors.pos);
+                    cnums.add(neighbors.cnum);
+                    neighbors.setVisited();
+                    nodeStack.push(neighbors);
+                }
+            }
+        }
+        int n = pos.size();
+        for(int i=0; i<cnums.size(); i++){
+            if(n!=0) {
+                posSizes[cnums.get(i) - 1] = n;
+            } else {
+                posSizes[cnums.get(i) - 1] = 1;
+            }
+        }
+    }
+}
+class Cow{
+    int cnum;
+    ArrayList<Integer> pos;
+    ArrayList<Cow> cneighbors;
+    boolean visited;
+    public Cow (int cnum){
+        this.cnum=cnum;
+        pos=new ArrayList<>();
+        cneighbors=new ArrayList<>();
+    }
+    public void addNeighbors(Cow c){
+        cneighbors.add(c);
+    }
+    public void setVisited(){
+        visited=true;
+    }
+    public void addPos (int p ){
+        pos.add(p);
+    }
+}
