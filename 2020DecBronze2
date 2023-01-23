@@ -1,0 +1,37 @@
+//USACO 2020 December Bronze Problem 2
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner myReader=new Scanner(System.in);
+        int numOfFlowers=myReader.nextInt();
+        int[] petals=new int[numOfFlowers];
+        for(int i=0; i<numOfFlowers; i++){
+            petals[i]=myReader.nextInt();
+        }
+        int count=0;
+        double average=0;
+        for(int i=2; i<petals.length+1; i++){
+            for(int x=0; x<petals.length-i+1; x++){
+                average=0;
+                for(int a=x; a<x+i; a++){
+                    average+=petals[a];
+                }
+                average=average/i;
+                for(int a=x; a<x+i; a++) {
+                    if (petals[a] == average) {
+                        count++;
+                        break;
+                    }
+                }
+            }
+        }
+        System.out.println(numOfFlowers+count);
+    }
+}
